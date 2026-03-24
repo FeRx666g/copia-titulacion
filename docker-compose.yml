@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  recolector:
+    image: ferx666g/backend-recolector:latest
+    container_name: recolector
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./credenciales:/app/credenciales
+    environment:
+      - PORT=8080
+
+  ml-python:
+    image: ferx666g/backend-ml:latest
+    container_name: ml-python
+    restart: always
+    ports:
+      - "8081:8080" 
+    volumes:
+      - ./modelo:/app/modelo
+    environment:
+      - PORT=8080
+
+  verificador:
+    image: ferx666g/backend-verificador:latest
+    container_name: verificador
+    restart: always
+    ports:
+      - "8082:8080" 
+    volumes:
+      - ./credenciales:/app/credenciales
+    environment:
+      - PORT=8080
+
+  frontend:
+    image: ferx666g/aplicacion_web_titulacion:latest
+    container_name: frontend
+    restart: always
+    ports:
+      - "80:80" 

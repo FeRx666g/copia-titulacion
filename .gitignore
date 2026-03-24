@@ -1,0 +1,16 @@
+backend/credenciales/*.json
+
+backend-ml/modelo/*.pkl
+
+backend-ml/modelo/*.h5
+
+backend-verificador/node_modules/
+
+backend-recolector/node_modules
+.env
+backend/node_modules
+
+venv/
+backend-ml/venv/
+__pycache__/
+*.pyc

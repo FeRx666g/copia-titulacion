@@ -1,0 +1,47 @@
+{
+  "name": "aplicacion_web_titulacion",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "axios": "^1.9.0",
+    "crypto-js": "^4.2.0",
+    "echarts": "^5.6.0",
+    "echarts-for-react": "^3.0.2",
+    "firebase": "^11.6.1",
+    "lucide-react": "^0.522.0",
+    "nanoid": "^5.1.5",
+    "papaparse": "^5.5.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-joyride": "^2.9.3",
+    "react-rnd": "^10.5.2",
+    "react-router-dom": "^6.30.0",
+    "react-zoom-pan-pinch": "^3.7.0",
+    "sweetalert2": "^11.22.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.1",
+    "vite-plugin-javascript-obfuscator": "^3.1.0",
+    "vite-plugin-obfuscator": "^1.0.5"
+  }
+}

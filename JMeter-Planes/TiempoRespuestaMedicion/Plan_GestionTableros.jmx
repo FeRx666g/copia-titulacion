@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Plan de Pruebas - Gestión Masiva de Tableros">
+      <stringProp name="TestPlan.comments">Creación, Edición y Eliminación de Tableros para 384 usuarios</stringProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables Definidas por el Usuario">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="API_KEY" elementType="Argument">
+            <stringProp name="Argument.name">API_KEY</stringProp>
+            <stringProp name="Argument.value">AIzaSyBI4-LGNFSoqqiO9wnc5I6I2yRWjCo2daU</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PROJECT_ID" elementType="Argument">
+            <stringProp name="Argument.name">PROJECT_ID</stringProp>
+            <stringProp name="Argument.value">proyecto-titulacion-9db38</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="WEB_URL" elementType="Argument">
+            <stringProp name="Argument.name">WEB_URL</stringProp>
+            <stringProp name="Argument.value">ml-energia-solar-6774-6784.me</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupo de Hilos - Masivo Tableros">
+        <intProp name="ThreadGroup.num_threads">3</intProp>
+        <intProp name="ThreadGroup.ramp_time">0</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador de Bucle">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Contador de Usuarios" enabled="true">
+          <stringProp name="CounterConfig.start">1</stringProp>
+          <stringProp name="CounterConfig.end">384</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">user_counter</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+        </CounterConfig>
+        <hashTree/>
+        <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Generador ID Tablero" enabled="true">
+          <stringProp name="maximumValue">999999</stringProp>
+          <stringProp name="minimumValue">100000</stringProp>
+          <stringProp name="outputFormat">TABLERO_000000</stringProp>
+          <boolProp name="perThread">false</boolProp>
+          <stringProp name="randomSeed"></stringProp>
+          <stringProp name="variableName">RANDOM_TABLERO_ID</stringProp>
+        </RandomVariableConfig>
+        <hashTree/>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Gestor de Cabeceras HTTP Config" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/json</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="1. Descargar Aplicación Web" enabled="true">
+          <boolProp name="HTTPSampler.image_parser">true</boolProp>
+          <stringProp name="HTTPSampler.domain">${WEB_URL}</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.path">/</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="0. Login Usuario" enabled="true">
+          <stringProp name="HTTPSampler.domain">identitytoolkit.googleapis.com</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.path">/v1/accounts:signInWithPassword?key=${API_KEY}</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;email&quot;: &quot;test${user_counter}@test.com&quot;,&#xd;
+  &quot;password&quot;: &quot;clavetest&quot;,&#xd;
+  &quot;returnSecureToken&quot;: true&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extractor Local ID" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">localId</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.localId</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extractor idToken" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">idToken</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.idToken</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="GESTIÓN TABLEROS COMPLETA" enabled="true">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth Header Firestore" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${idToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="3. Crear Tablero (Firestore)" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/tableros/${localId}/misTableros?documentId=${RANDOM_TABLERO_ID}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;fields&quot;: {&#xd;
+    &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Tablero Masivo ${RANDOM_TABLERO_ID}&quot; },&#xd;
+    &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; },&#xd;
+    &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }&#xd;
+  }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="4. Crear Slide Inicial (Firestore)" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/tableros/${localId}/misTableros/${RANDOM_TABLERO_ID}/diapositivas?documentId=slide-1</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;fields&quot;: {&#xd;
+    &quot;id&quot;: { &quot;stringValue&quot;: &quot;slide-1&quot; },&#xd;
+    &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;1&quot; },&#xd;
+    &quot;componentes&quot;: { &quot;arrayValue&quot;: { &quot;values&quot;: [] } }&#xd;
+  }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="5. Configurar Gráfico (Firestore)" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/tableros/${localId}/misTableros/${RANDOM_TABLERO_ID}/diapositivas/slide-1?updateMask.fieldPaths=componentes</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;fields&quot;: {&#xd;
+    &quot;componentes&quot;: {&#xd;
+      &quot;arrayValue&quot;: {&#xd;
+        &quot;values&quot;: [&#xd;
+          {&#xd;
+            &quot;mapValue&quot;: {&#xd;
+              &quot;fields&quot;: {&#xd;
+                &quot;id&quot;: { &quot;stringValue&quot;: &quot;grafico-1&quot; },&#xd;
+                &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;grafico-line&quot; },&#xd;
+                &quot;x&quot;: { &quot;integerValue&quot;: 50 },&#xd;
+                &quot;y&quot;: { &quot;integerValue&quot;: 50 },&#xd;
+                &quot;width&quot;: { &quot;integerValue&quot;: 400 },&#xd;
+                &quot;height&quot;: { &quot;integerValue&quot;: 300 },&#xd;
+                &quot;config&quot;: {&#xd;
+                  &quot;mapValue&quot;: {&#xd;
+                    &quot;fields&quot;: {&#xd;
+                      &quot;titulo&quot;: { &quot;stringValue&quot;: &quot;Grafico Inicial JMeter&quot; },&#xd;
+                      &quot;modoTiempoReal&quot;: { &quot;booleanValue&quot;: true }&#xd;
+                    }&#xd;
+                  }&#xd;
+                }&#xd;
+              }&#xd;
+            }&#xd;
+          }&#xd;
+        ]&#xd;
+      }&#xd;
+    }&#xd;
+  }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="6. Editar Título Gráfico (Firestore)" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/tableros/${localId}/misTableros/${RANDOM_TABLERO_ID}/diapositivas/slide-1?updateMask.fieldPaths=componentes</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;fields&quot;: {&#xd;
+    &quot;componentes&quot;: {&#xd;
+      &quot;arrayValue&quot;: {&#xd;
+        &quot;values&quot;: [&#xd;
+          {&#xd;
+            &quot;mapValue&quot;: {&#xd;
+              &quot;fields&quot;: {&#xd;
+                &quot;id&quot;: { &quot;stringValue&quot;: &quot;grafico-1&quot; },&#xd;
+                &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;grafico-line&quot; },&#xd;
+                &quot;x&quot;: { &quot;integerValue&quot;: 50 },&#xd;
+                &quot;y&quot;: { &quot;integerValue&quot;: 50 },&#xd;
+                &quot;width&quot;: { &quot;integerValue&quot;: 400 },&#xd;
+                &quot;height&quot;: { &quot;integerValue&quot;: 300 },&#xd;
+                &quot;config&quot;: {&#xd;
+                  &quot;mapValue&quot;: {&#xd;
+                    &quot;fields&quot;: {&#xd;
+                      &quot;titulo&quot;: { &quot;stringValue&quot;: &quot;Grafico EDITADO JMeter&quot; },&#xd;
+                      &quot;modoTiempoReal&quot;: { &quot;booleanValue&quot;: true }&#xd;
+                    }&#xd;
+                  }&#xd;
+                }&#xd;
+              }&#xd;
+            }&#xd;
+          }&#xd;
+        ]&#xd;
+      }&#xd;
+    }&#xd;
+  }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="7. Configurar Sensor en Gráfico (Firestore)" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/tableros/${localId}/misTableros/${RANDOM_TABLERO_ID}/diapositivas/slide-1?updateMask.fieldPaths=componentes</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;fields&quot;: {&#xd;
+    &quot;componentes&quot;: {&#xd;
+      &quot;arrayValue&quot;: {&#xd;
+        &quot;values&quot;: [&#xd;
+          {&#xd;
+            &quot;mapValue&quot;: {&#xd;
+              &quot;fields&quot;: {&#xd;
+                &quot;id&quot;: { &quot;stringValue&quot;: &quot;grafico-1&quot; },&#xd;
+                &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;grafico-line&quot; },&#xd;
+                &quot;x&quot;: { &quot;integerValue&quot;: 50 },&#xd;
+                &quot;y&quot;: { &quot;integerValue&quot;: 50 },&#xd;
+                &quot;width&quot;: { &quot;integerValue&quot;: 400 },&#xd;
+                &quot;height&quot;: { &quot;integerValue&quot;: 300 },&#xd;
+                &quot;config&quot;: {&#xd;
+                  &quot;mapValue&quot;: {&#xd;
+                    &quot;fields&quot;: {&#xd;
+                      &quot;titulo&quot;: { &quot;stringValue&quot;: &quot;Grafico con Sensor&quot; },&#xd;
+                      &quot;modoTiempoReal&quot;: { &quot;booleanValue&quot;: true },&#xd;
+                      &quot;dispositivoId&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_lux&quot; },&#xd;
+                      &quot;campo&quot;: { &quot;stringValue&quot;: &quot;lux&quot; },&#xd;
+                      &quot;nombreSerie&quot;: { &quot;stringValue&quot;: &quot;Sensor Lux&quot; },&#xd;
+                      &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;lx&quot; }&#xd;
+                    }&#xd;
+                  }&#xd;
+                }&#xd;
+              }&#xd;
+            }&#xd;
+          }&#xd;
+        ]&#xd;
+      }&#xd;
+    }&#xd;
+  }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8. Eliminar Gráfico (Firestore)" enabled="false">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/tableros/${localId}/misTableros/${RANDOM_TABLERO_ID}/diapositivas/slide-1?updateMask.fieldPaths=componentes</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;fields&quot;: {&#xd;
+    &quot;componentes&quot;: {&#xd;
+      &quot;arrayValue&quot;: {&#xd;
+        &quot;values&quot;: []&#xd;
+      }&#xd;
+    }&#xd;
+  }&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8. Eliminar Tablero (Firestore)" enabled="false">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/tableros/${localId}/misTableros/${RANDOM_TABLERO_ID}</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Ver Árbol de Resultados">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

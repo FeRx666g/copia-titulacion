@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Plan de Pruebas - Gestión Masiva de Sensores">
+      <stringProp name="TestPlan.comments">Creación de 4 Sensores (Lux, Temp, Hum, Nub) para 384 usuarios</stringProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables Definidas por el Usuario">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="API_KEY" elementType="Argument">
+            <stringProp name="Argument.name">API_KEY</stringProp>
+            <stringProp name="Argument.value">AIzaSyBI4-LGNFSoqqiO9wnc5I6I2yRWjCo2daU</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PROJECT_ID" elementType="Argument">
+            <stringProp name="Argument.name">PROJECT_ID</stringProp>
+            <stringProp name="Argument.value">proyecto-titulacion-9db38</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="WEB_URL" elementType="Argument">
+            <stringProp name="Argument.name">WEB_URL</stringProp>
+            <stringProp name="Argument.value">ml-energia-solar-6774-6784.me</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupo de Hilos - Masivo Sensores">
+        <intProp name="ThreadGroup.num_threads">384</intProp>
+        <intProp name="ThreadGroup.ramp_time">0</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador de Bucle">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Contador de Usuarios" enabled="true">
+          <stringProp name="CounterConfig.start">1</stringProp>
+          <stringProp name="CounterConfig.end">384</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">user_counter</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+        </CounterConfig>
+        <hashTree/>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Gestor de Cabeceras HTTP Config" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/json</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="1. Descargar Aplicación Web" enabled="true">
+          <boolProp name="HTTPSampler.image_parser">true</boolProp>
+          <stringProp name="HTTPSampler.domain">${WEB_URL}</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.path">/</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="0. Login Usuario">
+          <stringProp name="HTTPSampler.domain">identitytoolkit.googleapis.com</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.path">/v1/accounts:signInWithPassword?key=${API_KEY}</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;email&quot;: &quot;test${user_counter}@test.com&quot;,&#xd;
+  &quot;password&quot;: &quot;clavetest&quot;,&#xd;
+  &quot;returnSecureToken&quot;: true&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extractor Local ID" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">localId</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.localId</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extractor idToken" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">idToken</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.idToken</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="LISTAR SENSORES" enabled="true">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth Header Firestore" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${idToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET Listar Dispositivos" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="CREAR SENSORES" enabled="true">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth Header Firestore" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${idToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Crear Lux" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">true</boolProp>
+          </TransactionController>
+          <hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Global Lux" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_lux</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_lux&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Lux&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Lux&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;Lux&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;0&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;65500&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Usuario Lux" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_lux</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_lux&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Lux&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Lux&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;Lux&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;0&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;65500&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+          </hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Crear Temperatura" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">true</boolProp>
+          </TransactionController>
+          <hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Global Temperatura" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_temperatura</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_temperatura&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Temperatura&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Temperatura&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;°C&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;15&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;35&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Usuario Temperatura" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_temperatura</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_temperatura&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Temperatura&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Temperatura&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;°C&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;15&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;35&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+          </hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Crear Humedad" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">true</boolProp>
+          </TransactionController>
+          <hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Global Humedad" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_humedad</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_humedad&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Humedad&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Humedad&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;%&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;30&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;90&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Usuario Humedad" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_humedad</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_humedad&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Humedad&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Humedad&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;%&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;30&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;90&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+          </hashTree>
+          <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Crear Nubosidad" enabled="true">
+            <boolProp name="TransactionController.parent">true</boolProp>
+            <boolProp name="TransactionController.includeTimers">true</boolProp>
+          </TransactionController>
+          <hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Global Nubosidad" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_nubosidad</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_nubosidad&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Nubosidad&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Nubosidad&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;%&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;0&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;100&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Usuario Nubosidad" enabled="true">
+              <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_nubosidad</stringProp>
+              <stringProp name="HTTPSampler.method">PATCH</stringProp>
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;id_dispositivo&quot;: { &quot;stringValue&quot;: &quot;u${user_counter}_nubosidad&quot; }, &quot;nombre&quot;: { &quot;stringValue&quot;: &quot;Simulación Nubosidad&quot; }, &quot;tipo&quot;: { &quot;stringValue&quot;: &quot;Sensor&quot; }, &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor simulado de Nubosidad&quot; }, &quot;unidad&quot;: { &quot;stringValue&quot;: &quot;%&quot; }, &quot;valorMinimo&quot;: { &quot;stringValue&quot;: &quot;0&quot; }, &quot;valorMaximo&quot;: { &quot;stringValue&quot;: &quot;100&quot; }, &quot;uid&quot;: { &quot;stringValue&quot;: &quot;${localId}&quot; }, &quot;activo&quot;: { &quot;booleanValue&quot;: true }, &quot;creado&quot;: { &quot;timestampValue&quot;: &quot;${__time(yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;)}&quot; } } }</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="EDITAR SENSORES" enabled="true">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth Header Firestore" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${idToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Editar Lux" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_lux</stringProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor editado desde JMeter&quot; } } }descripcion</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PATCH Usuario Lux" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_lux</stringProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{ &quot;fields&quot;: { &quot;descripcion&quot;: { &quot;stringValue&quot;: &quot;Sensor editado desde JMeter&quot; } } }descripcion</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="ELIMINAR SENSORES" enabled="true">
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Auth Header Firestore" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${idToken}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Global Lux" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_lux</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Usuario Lux" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_lux</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Global Temperatura" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_temperatura</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Usuario Temperatura" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_temperatura</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Global Humedad" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_humedad</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Usuario Humedad" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_humedad</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Global Nubosidad" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/dispositivos/u${user_counter}_nubosidad</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE Usuario Nubosidad" enabled="true">
+            <stringProp name="HTTPSampler.domain">firestore.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/v1/projects/${PROJECT_ID}/databases/(default)/documents/usuarios/${localId}/dispositivos/u${user_counter}_nubosidad</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Ver Árbol de Resultados" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

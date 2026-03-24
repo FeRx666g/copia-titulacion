@@ -1,0 +1,64 @@
+name: Deploy Tesis Automatizado
+
+on:
+  push:
+    branches: [ "main" ] 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Login en Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    
+    - name: Build & Push Recolector
+      uses: docker/build-push-action@v4
+      with:
+        context: ./backend-recolector
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/backend-recolector:latest
+
+    - name: Build & Push ML
+      uses: docker/build-push-action@v4
+      with:
+        context: ./backend-ml
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/backend-ml:latest
+
+    - name: Build & Push Verificador
+      uses: docker/build-push-action@v4
+      with:
+        context: ./backend-verificador
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/backend-verificador:latest
+
+    - name: Build & Push Frontend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./aplicacion_web_titulacion
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/aplicacion_web_titulacion:latest
+
+    - name: Desplegar en DigitalOcean
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_IP }}
+        username: ${{ secrets.SSH_USER }}
+        # password: ${{ secrets.SSH_PASSWORD }} 
+        key: ${{ secrets.SSH_PRIVATE_KEY }} 
+        script: |
+          cd trabajo-titulacion
+          # Bajar las nuevas versiones de las imágenes
+          docker compose pull
+          # Reiniciar los contenedores con los cambios
+          docker compose up -d
+          # Limpiar basura (imágenes viejas)
+          docker image prune -f
