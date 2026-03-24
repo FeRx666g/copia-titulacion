@@ -3,7 +3,7 @@ version: '3.8'
 services:
   recolector:
     build: ./backend-recolector
-    image: ferx666g/backend-recolector:latest
+    image: titulacion-local/recolector:latest
     container_name: recolector
     restart: always
     ports:
@@ -15,7 +15,7 @@ services:
 
   ml-python:
     build: ./backend-ml
-    image: ferx666g/backend-ml:latest
+    image: titulacion-local/ml-python:latest
     container_name: ml-python
     restart: always
     ports:
@@ -27,7 +27,7 @@ services:
 
   verificador:
     build: ./backend-verificador
-    image: ferx666g/backend-verificador:latest
+    image: titulacion-local/verificador:latest
     container_name: verificador
     restart: always
     ports:
@@ -39,7 +39,7 @@ services:
 
   frontend:
     build: ./aplicacion_web_titulacion
-    image: ferx666g/aplicacion_web_titulacion:latest
+    image: titulacion-local/frontend:latest
     container_name: frontend
     restart: always
     ports:
