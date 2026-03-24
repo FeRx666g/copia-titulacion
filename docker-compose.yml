@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   recolector:
+    build: ./backend-recolector
     image: ferx666g/backend-recolector:latest
     container_name: recolector
     restart: always
@@ -13,6 +14,7 @@ services:
       - PORT=8080
 
   ml-python:
+    build: ./backend-ml
     image: ferx666g/backend-ml:latest
     container_name: ml-python
     restart: always
@@ -24,6 +26,7 @@ services:
       - PORT=8080
 
   verificador:
+    build: ./backend-verificador
     image: ferx666g/backend-verificador:latest
     container_name: verificador
     restart: always
@@ -35,6 +38,7 @@ services:
       - PORT=8080
 
   frontend:
+    build: ./aplicacion_web_titulacion
     image: ferx666g/aplicacion_web_titulacion:latest
     container_name: frontend
     restart: always
